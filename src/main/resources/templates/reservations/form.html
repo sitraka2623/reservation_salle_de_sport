@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/header :: head}"></head>
+<body>
+<nav th:replace="~{fragments/header :: navbar}"></nav>
+
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header bg-info text-white">
+                    <h4 th:if="${reservation.id == null}">
+                        <i class="bi bi-calendar-plus"></i> Nouvelle Réservation
+                    </h4>
+                    <h4 th:unless="${reservation.id == null}">
+                        <i class="bi bi-pencil"></i> Modifier la Réservation
+                    </h4>
+                </div>
+                <div class="card-body">
+                    <div th:if="${errorMessage}" class="alert alert-danger" role="alert">
+                        <span th:text="${errorMessage}"></span>
+                    </div>
+
+                    <form th:action="@{${reservation.id == null ? '/reservations' : '/reservations/' + reservation.id}}"
+                          th:object="${reservation}" method="post">
+
+                        <div class="mb-3">
+                            <label for="client" class="form-label">Client *</label>
+                            <select class="form-select" id="client" th:field="*{client}" required>
+                                <option value="">Sélectionner un client</option>
+                                <option th:each="client : ${clients}"
+                                        th:value="${client.id}"
+                                        th:text="${client.prenom + ' ' + client.nom + ' (' + client.email + ')'}"></option>
+                            </select>
+                            <div th:if="${#fields.hasErrors('client')}" class="text-danger">
+                                <small th:errors="*{client}"></small>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="salle" class="form-label">Salle *</label>
+                            <select class="form-select" id="salle" th:field="*{salle}" required>
+                                <option value="">Sélectionner une salle</option>
+                                <option th:each="salle : ${salles}"
+                                        th:value="${salle.id}"
+                                        th:text="${salle.nom + ' - ' + salle.type + ' (' + #numbers.formatDecimal(salle.prixHeure, 0, 0) + ' Ar/h)'}"></option>
+                            </select>
+                            <div th:if="${#fields.hasErrors('salle')}" class="text-danger">
+                                <small th:errors="*{salle}"></small>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="dateDebut" class="form-label">Date et heure de début *</label>
+                                    <input type="datetime-local" class="form-control" id="dateDebut"
+                                           th:field="*{dateDebut}" required>
+                                    <div th:if="${#fields.hasErrors('dateDebut')}" class="text-danger">
+                                        <small th:errors="*{dateDebut}"></small>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="dateFin" class="form-label">Date et heure de fin *</label>
+                                    <input type="datetime-local" class="form-control" id="dateFin"
+                                           th:field="*{dateFin}" required>
+                                    <div th:if="${#fields.hasErrors('dateFin')}" class="text-danger">
+                                        <small th:errors="*{dateFin}"></small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mb-3" th:if="${reservation.id != null}">
+                            <label for="statut" class="form-label">Statut</label>
+                            <select class="form-select" id="statut" th:field="*{statut}">
+                                <option th:each="statut : ${statuts}"
+                                        th:value="${statut}"
+                                        th:text="${statut}"></option>
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="remarques" class="form-label">Remarques</label>
+                            <textarea class="form-control" id="remarques" th:field="*{remarques}" rows="3"></textarea>
+                        </div>
+
+                        <div class="alert alert-info" role="alert">
+                            <i class="bi bi-info-circle"></i>
+                            Le prix total sera calculé automatiquement en fonction de la durée et du prix horaire de la salle.
+                        </div>
+
+                        <div class="d-flex justify-content-between">
+                            <a th:href="@{/reservations}" class="btn btn-secondary">
+                                <i class="bi bi-arrow-left"></i> Retour
+                            </a>
+                            <button type="submit" class="btn btn-info text-white">
+                                <i class="bi bi-check-circle"></i>
+                                <span th:text="${reservation.id == null} ? 'Créer' : 'Modifier'"></span>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<footer th:replace="~{fragments/footer :: footer}"></footer>
+<div th:replace="~{fragments/footer :: scripts}"></div>
+</body>
+</html>

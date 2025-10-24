@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/header :: head}"></head>
+<body>
+<nav th:replace="~{fragments/header :: navbar}"></nav>
+
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header bg-success text-white">
+                    <h4 th:if="${client.id == null}">
+                        <i class="bi bi-person-plus"></i> Nouveau Client
+                    </h4>
+                    <h4 th:unless="${client.id == null}">
+                        <i class="bi bi-pencil"></i> Modifier le Client
+                    </h4>
+                </div>
+                <div class="card-body">
+                    <div th:if="${errorMessage}" class="alert alert-danger" role="alert">
+                        <span th:text="${errorMessage}"></span>
+                    </div>
+
+                    <form th:action="@{${client.id == null ? '/clients' : '/clients/' + client.id}}"
+                          th:object="${client}" method="post">
+
+                        <!-- Champ caché pour l'ID en mode modification -->
+                        <input type="hidden" th:if="${client.id != null}" th:field="*{id}">
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="nom" class="form-label">Nom *</label>
+                                    <input type="text" class="form-control" id="nom" th:field="*{nom}" required>
+                                    <div th:if="${#fields.hasErrors('nom')}" class="text-danger">
+                                        <small th:errors="*{nom}"></small>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="prenom" class="form-label">Prénom *</label>
+                                    <input type="text" class="form-control" id="prenom" th:field="*{prenom}" required>
+                                    <div th:if="${#fields.hasErrors('prenom')}" class="text-danger">
+                                        <small th:errors="*{prenom}"></small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="email" class="form-label">Email *</label>
+                            <input type="email" class="form-control" id="email" th:field="*{email}" required>
+                            <div th:if="${#fields.hasErrors('email')}" class="text-danger">
+                                <small th:errors="*{email}"></small>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="telephone" class="form-label">Téléphone *</label>
+                            <input type="tel" class="form-control" id="telephone" th:field="*{telephone}"
+                                   placeholder="+33612345678" required>
+                            <div th:if="${#fields.hasErrors('telephone')}" class="text-danger">
+                                <small th:errors="*{telephone}"></small>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="adresse" class="form-label">Adresse</label>
+                            <textarea class="form-control" id="adresse" th:field="*{adresse}" rows="2"></textarea>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="typeAbonnement" class="form-label">Type d'abonnement *</label>
+                            <select class="form-select" id="typeAbonnement" th:field="*{typeAbonnement}" required>
+                                <option th:each="type : ${typesAbonnement}"
+                                        th:value="${type}"
+                                        th:text="${type}"></option>
+                            </select>
+                            <div th:if="${#fields.hasErrors('typeAbonnement')}" class="text-danger">
+                                <small th:errors="*{typeAbonnement}"></small>
+                            </div>
+                        </div>
+
+                        <div class="d-flex justify-content-between">
+                            <a th:href="@{/clients}" class="btn btn-secondary">
+                                <i class="bi bi-arrow-left"></i> Retour
+                            </a>
+                            <button type="submit" class="btn btn-success">
+                                <i class="bi bi-check-circle"></i>
+                                <span th:text="${client.id == null} ? 'Créer' : 'Modifier'"></span>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<footer th:replace="~{fragments/footer :: footer}"></footer>
+<div th:replace="~{fragments/footer :: scripts}"></div>
+</body>
+</html>

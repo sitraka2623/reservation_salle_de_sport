@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/header :: head}"></head>
+<body>
+    <nav th:replace="~{fragments/header :: navbar}"></nav>
+    
+    <div class="container mt-4">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="card">
+                    <div class="card-header bg-success text-white">
+                        <h4><i class="bi bi-person"></i> Détails du Client</h4>
+                    </div>
+                    <div class="card-body">
+                        <div class="row mb-3">
+                            <div class="col-md-4 fw-bold">ID:</div>
+                            <div class="col-md-8" th:text="${client.id}"></div>
+                        </div>
+                        
+                        <div class="row mb-3">
+                            <div class="col-md-4 fw-bold">Nom complet:</div>
+                            <div class="col-md-8" th:text="${client.prenom + ' ' + client.nom}"></div>
+                        </div>
+                        
+                        <div class="row mb-3">
+                            <div class="col-md-4 fw-bold">Email:</div>
+                            <div class="col-md-8">
+                                <a th:href="${'mailto:' + client.email}" th:text="${client.email}"></a>
+                            </div>
+                        </div>
+                        
+                        <div class="row mb-3">
+                            <div class="col-md-4 fw-bold">Téléphone:</div>
+                            <div class="col-md-8">
+                                <a th:href="${'tel:' + client.telephone}" th:text="${client.telephone}"></a>
+                            </div>
+                        </div>
+                        
+                        <div class="row mb-3" th:if="${client.adresse}">
+                            <div class="col-md-4 fw-bold">Adresse:</div>
+                            <div class="col-md-8" th:text="${client.adresse}"></div>
+                        </div>
+                        
+                        <div class="row mb-3">
+                            <div class="col-md-4 fw-bold">Type d'abonnement:</div>
+                            <div class="col-md-8">
+                                <span class="badge"
+                                      th:classappend="${client.typeAbonnement == 'ANNUEL'} ? 'bg-success' : 
+                                                     (${client.typeAbonnement == 'TRIMESTRIEL'} ? 'bg-info' : 
+                                                     (${client.typeAbonnement == 'MENSUEL'} ? 'bg-warning' : 'bg-secondary'))"
+                                      th:text="${client.typeAbonnement}"></span>
+                            </div>
+                        </div>
+                        
+                        <div class="row mb-3">
+                            <div class="col-md-4 fw-bold">Date d'inscription:</div>
+                            <div class="col-md-8" th:text="${#temporals.format(client.dateInscription, 'dd/MM/yyyy')}"></div>
+                        </div>
+                        
+                        <hr>
+                        
+                        <div class="d-flex justify-content-between">
+                            <a th:href="@{/clients}" class="btn btn-secondary">
+                                <i class="bi bi-arrow-left"></i> Retour à la liste
+                            </a>
+                            <div>
+                                <a th:href="@{/clients/{id}/edit(id=${client.id})}" class="btn btn-warning">
+                                    <i class="bi bi-pencil"></i> Modifier
+                                </a>
+                                <a th:href="@{/clients/{id}/delete(id=${client.id})}" 
+                                   class="btn btn-danger"
+                                   onclick="return confirm('Êtes-vous sûr de vouloir supprimer ce client?')">
+                                    <i class="bi bi-trash"></i> Supprimer
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <footer th:replace="~{fragments/footer :: footer}"></footer>
+    <div th:replace="~{fragments/footer :: scripts}"></div>
+</body>
+</html>

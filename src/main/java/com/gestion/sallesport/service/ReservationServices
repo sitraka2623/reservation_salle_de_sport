@@ -1,0 +1,29 @@
+package com.gestion.sallesport.service;
+
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+
+@Service
+@RequiredArgsConstructor
+public class DashboardService {
+
+    private final ClientService clientService;
+    private final SalleService salleService;
+    private final ReservationService reservationService;
+
+    public long totalClients() {
+        return clientService.getAllClients().size();
+    }
+
+    public long totalSalles() {
+        return salleService.countSalles();
+    }
+
+    public long totalReservations() {
+        return reservationService.countReservations();
+    }
+
+    public double revenueMonth() {
+        return reservationService.revenueMonth();
+    }
+}

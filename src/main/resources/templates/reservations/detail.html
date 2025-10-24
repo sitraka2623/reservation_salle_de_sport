@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/header :: head}"></head>
+<body>
+    <nav th:replace="~{fragments/header :: navbar}"></nav>
+    
+    <div class="container mt-4">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="card">
+                    <div class="card-header bg-info text-white">
+                        <h4><i class="bi bi-calendar-check"></i> Détails de la Réservation</h4>
+                    </div>
+                    <div class="card-body">
+                        <div class="row mb-3">
+                            <div class="col-md-4 fw-bold">ID:</div>
+                            <div class="col-md-8" th:text="${reservation.id}"></div>
+                        </div>
+                        
+                        <div class="row mb-3">
+                            <div class="col-md-4 fw-bold">Client:</div>
+                            <div class="col-md-8">
+                                <a th:href="@{/clients/{id}(id=${reservation.client.id})}" 
+                                   th:text="${reservation.client.prenom + ' ' + reservation.client.nom}"></a>
+                            </div>
+                        </div>
+                        
+                        <div class="row mb-3">
+                            <div class="col-md-4 fw-bold">Email du client:</div>
+                            <div class="col-md-8">
+                                <a th:href="${'mailto:' + reservation.client.email}" 
+                                   th:text="${reservation.client.email}"></a>
+                            </div>
+                        </div>
+                        
+                        <div class="row mb-3">
+                            <div class="col-md-4 fw-bold">Salle:</div>
+                            <div class="col-md-8">
+                                <a th:href="@{/salles/{id}(id=${reservation.salle.id})}" 
+                                   th:text="${reservation.salle.nom + ' (' + reservation.salle.type + ')'}"></a>
+                            </div>
+                        </div>
+                        
+                        <div class="row mb-3">
+                            <div class="col-md-4 fw-bold">Date et heure de début:</div>
+                            <div class="col-md-8" th:text="${#temporals.format(reservation.dateDebut, 'dd/MM/yyyy HH:mm')}"></div>
+                        </div>
+                        
+                        <div class="row mb-3">
+                            <div class="col-md-4 fw-bold">Date et heure de fin:</div>
+                            <div class="col-md-8" th:text="${#temporals.format(reservation.dateFin, 'dd/MM/yyyy HH:mm')}"></div>
+                        </div>
+                        
+                        <div class="row mb-3">
+                            <div class="col-md-4 fw-bold">Durée:</div>
+                            <div class="col-md-8" th:text="${T(java.time.Duration).between(reservation.dateDebut, reservation.dateFin).toHours()} + ' heure(s)'"></div>
+                        </div>
+                        
+                        <div class="row mb-3">
+                            <div class="col-md-4 fw-bold">Prix total:</div>
+                            <div class="col-md-8" th:text="${#numbers.formatDecimal(reservation.prixTotal, 0, 0) + ' Ar'}"></div>
+                        </div>
+                        
+                        <div class="row mb-3">
+                            <div class="col-md-4 fw-bold">Statut:</div>
+                            <div class="col-md-8">
+                                <span class="badge"
+                                      th:classappend="${reservation.statut == 'CONFIRMEE'} ? 'bg-success' : 
+                                                     (${reservation.statut == 'EN_ATTENTE'} ? 'bg-warning' : 
+                                                     (${reservation.statut == 'ANNULEE'} ? 'bg-danger' : 'bg-secondary'))"
+                                      th:text="${reservation.statut}"></span>
+                            </div>
+                        </div>
+                        
+                        <div class="row mb-3">
+                            <div class="col-md-4 fw-bold">Date de création:</div>
+                            <div class="col-md-8" th:text="${#temporals.format(reservation.dateCreation, 'dd/MM/yyyy HH:mm')}"></div>
+                        </div>
+                        
+                        <div class="row mb-3" th:if="${reservation.remarques}">
+                            <div class="col-md-4 fw-bold">Remarques:</div>
+                            <div class="col-md-8" th:text="${reservation.remarques}"></div>
+                        </div>
+                        
+                        <hr>
+                        
+                        <div class="d-flex justify-content-between">
+                            <a th:href="@{/reservations}" class="btn btn-secondary">
+                                <i class="bi bi-arrow-left"></i> Retour à la liste
+                            </a>
+                            <div>
+                                <a th:href="@{/reservations/{id}/edit(id=${reservation.id})}" 
+                                   class="btn btn-warning">
+                                    <i class="bi bi-pencil"></i> Modifier
+                                </a>
+                                <a th:if="${reservation.statut == 'EN_ATTENTE'}"
+                                   th:href="@{/reservations/{id}/confirmer(id=${reservation.id})}" 
+                                   class="btn btn-success">
+                                    <i class="bi bi-check-circle"></i> Confirmer
+                                </a>
+                                <a th:if="${reservation.statut != 'ANNULEE'}"
+                                   th:href="@{/reservations/{id}/annuler(id=${reservation.id})}" 
+                                   class="btn btn-danger">
+                                    <i class="bi bi-x-circle"></i> Annuler
+                                </a>
+                                <a th:href="@{/reservations/{id}/delete(id=${reservation.id})}" 
+                                   class="btn btn-outline-danger"
+                                   onclick="return confirm('Êtes-vous sûr de vouloir supprimer cette réservation?')">
+                                    <i class="bi bi-trash"></i> Supprimer
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <footer th:replace="~{fragments/footer :: footer}"></footer>
+    <div th:replace="~{fragments/footer :: scripts}"></div>
+</body>
+</html>

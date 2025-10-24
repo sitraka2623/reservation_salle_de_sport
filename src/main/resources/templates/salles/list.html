@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/header :: head}"></head>
+<body>
+    <nav th:replace="~{fragments/header :: navbar}"></nav>
+    
+    <div class="container-fluid px-4 mt-4">
+        <!-- Page Header -->
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h2 class="mb-1">
+                    <i class="bi bi-building text-primary"></i>
+                    Gestion des Salles
+                </h2>
+                <p class="text-muted mb-0">Gérez vos espaces sportifs</p>
+            </div>
+            <div class="d-flex gap-2 mt-5">
+                <a th:href="@{/salles/disponibles}" class="btn btn-outline-info">
+                    <i class="bi bi-search"></i>
+                    Salles Disponibles
+                </a>
+                <a th:href="@{/salles/new}" class="btn btn-primary">
+                    <i class="bi bi-plus-circle"></i>
+                    Nouvelle Salle
+                </a>
+            </div>
+        </div>
+        
+        <!-- Success Message -->
+        <div th:if="${successMessage}" class="alert alert-success alert-dismissible fade show" role="alert">
+            <i class="bi bi-check-circle"></i>
+            <span th:text="${successMessage}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+        
+        <!-- Quick Stats -->
+        <div class="row mb-4">
+            <div class="col-lg-3 col-md-6 mb-3">
+                <div class="stats-card">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <span class="stats-number" th:text="${#lists.size(salles)}">0</span>
+                            <span class="stats-label">Total Salles</span>
+                        </div>
+                        <div class="card-icon primary">
+                            <i class="bi bi-building"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6 mb-3">
+                <div class="stats-card">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <span class="stats-number" th:text="${nombreDisponibles}">0</span>
+                            <span class="stats-label">Disponibles</span>
+                        </div>
+                        <div class="card-icon success">
+                            <i class="bi bi-check-circle"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6 mb-3">
+                <div class="stats-card">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <span class="stats-number" th:text="${capaciteTotale}">0</span>
+                            <span class="stats-label">Capacité Totale</span>
+                        </div>
+                        <div class="card-icon info">
+                            <i class="bi bi-people"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6 mb-3">
+                <div class="stats-card">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <span class="stats-number">
+                                <span th:text="${#numbers.formatDecimal(prixMoyen, 0, 0)}">0</span> Ar
+                            </span>
+                            <span class="stats-label">Prix Moyen/H</span>
+                        </div>
+                        <div class="card-icon warning">
+                            <i class="bi bi-cash-coin"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Salles List -->
+        <div class="card">
+            <div class="card-header">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">
+                        <i class="bi bi-list-ul text-primary"></i>
+                        Liste des Salles
+                    </h5>
+                    <div class="d-flex gap-2">
+                        <div class="dropdown">
+                            <button class="btn btn-outline-secondary btn-sm dropdown-toggle" type="button" 
+                                    data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="bi bi-funnel"></i>
+                                Filtrer
+                            </button>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="#" onclick="filterByType('tous')">Tous types</a></li>
+                                <li><a class="dropdown-item" href="#" onclick="filterByType('Musculation')">Musculation</a></li>
+                                <li><a class="dropdown-item" href="#" onclick="filterByType('Cardio')">Cardio</a></li>
+                                <li><a class="dropdown-item" href="#" onclick="filterByType('Yoga')">Yoga</a></li>
+                                <li><a class="dropdown-item" href="#" onclick="filterByType('Danse')">Danse</a></li>
+                            </ul>
+                        </div>
+                        <div class="dropdown">
+                            <button class="btn btn-outline-secondary btn-sm dropdown-toggle" type="button" 
+                                    data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="bi bi-sort-down"></i>
+                                Trier
+                            </button>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="#" onclick="sortTable('nom')">Par nom</a></li>
+                                <li><a class="dropdown-item" href="#" onclick="sortTable('capacite')">Par capacité</a></li>
+                                <li><a class="dropdown-item" href="#" onclick="sortTable('prixHeure')">Par prix</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover" id="sallesTable">
+                        <thead>
+                            <tr>
+                                <th><i class="bi bi-hash"></i> ID</th>
+                                <th><i class="bi bi-tag"></i> Nom</th>
+                                <th><i class="bi bi-collection"></i> Type</th>
+                                <th><i class="bi bi-people"></i> Capacité</th>
+                                <th><i class="bi bi-cash-coin"></i> Prix/Heure</th>
+                                <th><i class="bi bi-check-circle"></i> Statut</th>
+                                <th><i class="bi bi-tools"></i> Équipements</th>
+                                <th><i class="bi bi-gear"></i> Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="salle : ${salles}" th:attr="data-type=${salle.type}">
+                                <td>
+                                    <span class="badge bg-light text-dark" th:text="${salle.id}"></span>
+                                </td>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <div class="me-2">
+                                            <i class="bi bi-building text-primary"></i>
+                                        </div>
+                                        <div>
+                                            <h6 class="mb-0" th:text="${salle.nom}"></h6>
+                                            <small class="text-muted" th:text="${salle.description}" 
+                                                   th:if="${salle.description}"></small>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <span class="badge" 
+                                          th:classappend="${salle.type == 'Musculation'} ? 'bg-danger' : 
+                                                         (${salle.type == 'Cardio'} ? 'bg-warning' : 
+                                                         (${salle.type == 'Yoga'} ? 'bg-info' : 
+                                                         (${salle.type == 'Danse'} ? 'bg-success' : 'bg-secondary')))"
+                                          th:text="${salle.type}"></span>
+                                </td>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <i class="bi bi-people me-1"></i>
+                                        <span th:text="${salle.capacite}"></span>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="fw-bold text-success">
+                                        <span th:text="${#numbers.formatDecimal(salle.prixHeure, 0, 0)}"></span> Ar
+                                    </div>
+                                </td>
+                                <td>
+                                    <span th:if="${salle.disponible}" class="badge bg-success">
+                                        <i class="bi bi-check-circle"></i> Disponible
+                                    </span>
+                                    <span th:unless="${salle.disponible}" class="badge bg-danger">
+                                        <i class="bi bi-x-circle"></i> Indisponible
+                                    </span>
+                                </td>
+                                <td>
+                                    <div th:if="${salle.equipements}" class="text-truncate" style="max-width: 150px;">
+                                        <small class="text-muted" th:text="${salle.equipements}" 
+                                               th:title="${salle.equipements}"></small>
+                                    </div>
+                                    <small th:unless="${salle.equipements}" class="text-muted fst-italic">
+                                        Non spécifié
+                                    </small>
+                                </td>
+                                <td>
+                                    <div class="btn-group" role="group">
+                                        <a th:href="@{/salles/{id}(id=${salle.id})}" 
+                                           class="btn btn-outline-info btn-sm" 
+                                           data-bs-toggle="tooltip" title="Voir détails">
+                                            <i class="bi bi-eye"></i>
+                                        </a>
+                                        <a th:href="@{/salles/{id}/edit(id=${salle.id})}" 
+                                           class="btn btn-outline-warning btn-sm"
+                                           data-bs-toggle="tooltip" title="Modifier">
+                                            <i class="bi bi-pencil"></i>
+                                        </a>
+                                        <a th:href="@{/salles/{id}/delete(id=${salle.id})}" 
+                                           class="btn btn-outline-danger btn-sm"
+                                           data-bs-toggle="tooltip" title="Supprimer"
+                                           onclick="return confirm('Êtes-vous sûr de vouloir supprimer cette salle?')">
+                                            <i class="bi bi-trash"></i>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr th:if="${#lists.isEmpty(salles)}">
+                                <td colspan="8" class="text-center py-5">
+                                    <div class="text-muted">
+                                        <i class="bi bi-building" style="font-size: 3rem; opacity: 0.3;"></i>
+                                        <h5 class="mt-3">Aucune salle trouvée</h5>
+                                        <p>Commencez par ajouter votre première salle de sport</p>
+                                        <a th:href="@{/salles/new}" class="btn btn-primary">
+                                            <i class="bi bi-plus-circle"></i>
+                                            Ajouter une salle
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <footer th:replace="~{fragments/footer :: footer}"></footer>
+    <div th:replace="~{fragments/footer :: scripts}"></div>
+    
+    <!-- Page specific JavaScript -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize tooltips
+            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+            var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+                return new bootstrap.Tooltip(tooltipTriggerEl);
+            });
+        });
+        
+        function filterByType(type) {
+            const rows = document.querySelectorAll('#sallesTable tbody tr');
+            rows.forEach(row => {
+                if (type === 'tous' || row.getAttribute('data-type') === type) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+        }
+        
+        function sortTable(column) {
+            const table = document.getElementById('sallesTable');
+            const tbody = table.getElementsByTagName('tbody')[0];
+            const rows = Array.from(tbody.getElementsByTagName('tr'));
+            
+            rows.sort((a, b) => {
+                const aValue = getColumnValue(a, column);
+                const bValue = getColumnValue(b, column);
+                
+                if (column === 'capacite' || column === 'prixHeure') {
+                    return parseFloat(aValue) - parseFloat(bValue);
+                } else {
+                    return aValue.localeCompare(bValue);
+                }
+            });
+            
+            rows.forEach(row => tbody.appendChild(row));
+        }
+        
+        function getColumnValue(row, column) {
+            const cells = row.getElementsByTagName('td');
+            switch(column) {
+                case 'nom':
+                    return cells[1].textContent.trim();
+                case 'capacite':
+                    return cells[3].textContent.trim();
+                case 'prixHeure':
+                    return cells[4].textContent.trim().replace('Ar', '');
+                default:
+                    return '';
+            }
+        }
+    </script>
+</body>
+</html>

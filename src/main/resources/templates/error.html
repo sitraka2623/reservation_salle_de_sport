@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/header :: head}"></head>
+<body>
+    <nav th:replace="~{fragments/header :: navbar}"></nav>
+    
+    <div class="container mt-4">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="card">
+                    <div class="card-header bg-danger text-white">
+                        <h4><i class="bi bi-exclamation-triangle"></i> Erreur</h4>
+                    </div>
+                    <div class="card-body text-center">
+                        <h1 class="display-1 text-danger" th:text="${status} ?: '500'">500</h1>
+                        <h2 th:text="${error} ?: 'Erreur interne du serveur'">Erreur interne du serveur</h2>
+                        <p class="lead" th:text="${message} ?: 'Une erreur inattendue s\'est produite'">
+                            Une erreur inattendue s'est produite
+                        </p>
+                        <hr>
+                        <a th:href="@{/}" class="btn btn-primary">
+                            <i class="bi bi-house"></i> Retour à l'accueil
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <footer th:replace="~{fragments/footer :: footer}"></footer>
+    <div th:replace="~{fragments/footer :: scripts}"></div>
+</body>
+</html>

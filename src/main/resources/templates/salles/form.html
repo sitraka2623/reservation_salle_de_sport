@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/header :: head}"></head>
+<body>
+<nav th:replace="~{fragments/header :: navbar}"></nav>
+
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h4 th:if="${salle.id == null}">
+                        <i class="bi bi-plus-circle"></i> Nouvelle Salle
+                    </h4>
+                    <h4 th:unless="${salle.id == null}">
+                        <i class="bi bi-pencil"></i> Modifier la Salle
+                    </h4>
+                </div>
+                <div class="card-body">
+                    <form th:action="@{${salle.id == null ? '/salles' : '/salles/' + salle.id}}"
+                          th:object="${salle}" method="post">
+
+                        <div class="mb-3">
+                            <label for="nom" class="form-label">Nom *</label>
+                            <input type="text" class="form-control" id="nom" th:field="*{nom}" required>
+                            <div th:if="${#fields.hasErrors('nom')}" class="text-danger">
+                                <small th:errors="*{nom}"></small>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="type" class="form-label">Type *</label>
+                            <select class="form-select" id="type" th:field="*{type}" required>
+                                <option value="">Sélectionner un type</option>
+                                <option value="Musculation">Musculation</option>
+                                <option value="Cardio">Cardio</option>
+                                <option value="Yoga">Yoga</option>
+                                <option value="Danse">Danse</option>
+                                <option value="Arts Martiaux">Arts Martiaux</option>
+                                <option value="Crossfit">Crossfit</option>
+                                <option value="Multifonction">Multifonction</option>
+                            </select>
+                            <div th:if="${#fields.hasErrors('type')}" class="text-danger">
+                                <small th:errors="*{type}"></small>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="capacite" class="form-label">Capacité *</label>
+                                    <input type="number" class="form-control" id="capacite"
+                                           th:field="*{capacite}" min="1" required>
+                                    <div th:if="${#fields.hasErrors('capacite')}" class="text-danger">
+                                        <small th:errors="*{capacite}"></small>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="prixHeure" class="form-label">Prix par heure (Ar) *</label>
+                                    <input type="number" class="form-control" id="prixHeure"
+                                           th:field="*{prixHeure}" step="1000" min="0" required>
+                                    <div th:if="${#fields.hasErrors('prixHeure')}" class="text-danger">
+                                        <small th:errors="*{prixHeure}"></small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="equipements" class="form-label">Équipements</label>
+                            <input type="text" class="form-control" id="equipements" th:field="*{equipements}"
+                                   placeholder="Ex: Tapis de course, Haltères, Miroirs...">
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="description" class="form-label">Description</label>
+                            <textarea class="form-control" id="description" th:field="*{description}"
+                                      rows="3"></textarea>
+                        </div>
+
+                        <div class="mb-3">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="disponible"
+                                       th:field="*{disponible}">
+                                <label class="form-check-label" for="disponible">
+                                    Salle disponible
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="d-flex justify-content-between">
+                            <a th:href="@{/salles}" class="btn btn-secondary">
+                                <i class="bi bi-arrow-left"></i> Retour
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-check-circle"></i>
+                                <span th:text="${salle.id == null} ? 'Créer' : 'Modifier'"></span>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<footer th:replace="~{fragments/footer :: footer}"></footer>
+<div th:replace="~{fragments/footer :: scripts}"></div>
+</body>
+</html>

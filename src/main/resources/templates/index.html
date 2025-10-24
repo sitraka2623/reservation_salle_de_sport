@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/header :: head}">
+    <meta charset="UTF-8">
+    <title>SportManager Pro Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <style>
+        body { background-color: #f8f9fa; }
+        .stats-card { background-color: #fff; border-radius:12px; padding:20px; box-shadow:0 4px 12px rgba(0,0,0,0.08); transition: transform 0.3s, box-shadow 0.3s; }
+        .stats-card:hover { transform: translateY(-5px); box-shadow:0 10px 20px rgba(0,0,0,0.12);}
+        .stats-number { font-size:2rem; font-weight:700; }
+        .stats-label { color:#6c757d; font-size:0.9rem; }
+        .card-icon { font-size:2.5rem; padding:15px; border-radius:50%; color:#fff; display:flex; align-items:center; justify-content:center; }
+        .card-icon.primary { background: #667eea; }
+        .card-icon.success { background: #4ade80; }
+        .card-icon.info { background: #3b82f6; }
+        .card-icon.warning { background: #fbbf24; }
+        .fade-in-up { opacity:0; transform: translateY(20px); animation: fadeInUp 0.6s forwards;}
+        @keyframes fadeInUp { to { opacity:1; transform: translateY(0);} }
+    </style>
+</head>
+<body>
+<nav th:replace="~{fragments/header :: navbar}"></nav>
+
+<div class="container-fluid px-4 mt-4">
+
+    <!-- Hero Section -->
+    <div class="hero-section fade-in-up text-center mb-4 mt-5">
+        <h1><i class="bi bi-activity me-3"></i> SportManager Pro</h1>
+        <p class="lead">Plateforme professionnelle de gestion des salles de sport</p>
+        <div class="d-flex justify-content-center gap-3 flex-wrap">
+            <a th:href="@{/reservations/new}" class="btn btn-primary btn-lg"><i class="bi bi-calendar-plus"></i> Nouvelle Réservation</a>
+            <a th:href="@{/clients/new}" class="btn btn-outline-primary btn-lg"><i class="bi bi-person-plus"></i> Nouveau Client</a>
+        </div>
+    </div>
+
+    <!-- Stats Cards -->
+    <div class="row mb-4 g-4">
+        <div class="col-lg-3 col-md-6">
+            <div class="stats-card fade-in-up">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <span class="stats-number" th:text="${totalSalles}">0</span>
+                        <span class="stats-label">Salles Actives</span>
+                    </div>
+                    <div class="card-icon primary"><i class="bi bi-building"></i></div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6">
+            <div class="stats-card fade-in-up">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <span class="stats-number" th:text="${totalClients}">0</span>
+                        <span class="stats-label">Clients Inscrits</span>
+                    </div>
+                    <div class="card-icon success"><i class="bi bi-people"></i></div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6">
+            <div class="stats-card fade-in-up">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <span class="stats-number" th:text="${totalReservations}">0</span>
+                        <span class="stats-label">Réservations Actives</span>
+                    </div>
+                    <div class="card-icon info"><i class="bi bi-calendar-check"></i></div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6">
+            <div class="stats-card fade-in-up">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <span class="stats-number" th:text="${#numbers.formatDecimal(revenueMonth,0,'')}">0</span>
+                        <span class="stats-label">Revenus du Mois</span>
+                    </div>
+                    <div class="card-icon warning"><i class="bi bi-graph-up"></i></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Reservations & Popular Rooms -->
+    <div class="row mb-4">
+        <!-- Recent Reservations -->
+        <div class="col-lg-6 mb-4">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0"><i class="bi bi-clock-history text-info"></i> Réservations Récentes</h5>
+                    <a th:href="@{/reservations}" class="btn btn-sm btn-outline-primary">Voir tout</a>
+                </div>
+                <div class="card-body p-0">
+                    <div class="list-group list-group-flush">
+                        <div th:each="res : ${recentReservations}" class="list-group-item d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 th:text="${res.client.nom + ' ' + res.client.prenom}">Nom Client</h6>
+                                <p class="mb-1 text-muted small" th:text="${res.salle.nom}">Salle</p>
+                                <small class="text-muted" th:text="${#dates.format(res.dateDebut,'dd/MM/yyyy HH:mm') + ' - ' + #dates.format(res.dateFin,'HH:mm')}">Date</small>
+                            </div>
+                            <span class="badge" th:classappend="${res.statut.name() == 'CONFIRMEE'} ? 'bg-success' : 'bg-warning'" th:text="${res.statut.name()}">Statut</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Popular Rooms -->
+        <div class="col-lg-6 mb-4">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0"><i class="bi bi-star text-warning"></i> Salles Populaires</h5>
+                    <a th:href="@{/salles}" class="btn btn-sm btn-outline-primary">Voir tout</a>
+                </div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div th:each="salle : ${popularSalles}" class="col-12">
+                            <div class="d-flex justify-content-between align-items-center p-3 bg-light rounded">
+                                <div>
+                                    <h6 th:text="${salle.nom}">Nom Salle</h6>
+                                    <small class="text-muted" th:text="${salle.capacite + ' places • ' + salle.prixHeure + ' Ar/h'}">Capacité & Prix</small>
+                                </div>
+                                <div class="text-end">
+                                    <div class="progress mb-1" style="width: 80px; height: 6px;">
+                                        <div class="progress-bar" th:classappend="${salle.occupancyRate >= 80} ? 'bg-success' : (salle.occupancyRate >= 50 ? 'bg-info' : 'bg-warning')" th:style="'width:' + salle.occupancyRate + '%'"></div>
+                                    </div>
+                                    <small class="text-muted" th:text="${salle.occupancyRate + '% occupée'}">Taux Occupation</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Insights / Aperçu Rapide -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="bi bi-lightbulb text-warning"></i> Aperçu Rapide</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row text-center">
+                        <div class="col-md-4">
+                            <div class="p-3">
+                                <i class="bi bi-check-circle text-success" style="font-size: 2rem;"></i>
+                                <h6 class="mt-2">Système Opérationnel</h6>
+                                <small class="text-muted">Toutes les fonctionnalités sont actives</small>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="p-3">
+                                <i class="bi bi-shield-check text-success" style="font-size: 2rem;"></i>
+                                <h6 class="mt-2">Sécurité Active</h6>
+                                <small class="text-muted">Validation et contrôles actifs</small>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="p-3">
+                                <i class="bi bi-speedometer2 text-primary" style="font-size: 2rem;"></i>
+                                <h6 class="mt-2">Performance Optimale</h6>
+                                <small class="text-muted">Temps de réponse excellent</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<footer th:replace="~{fragments/footer :: footer}"></footer>
+
+<!-- Dashboard JS -->
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const ctx = document.getElementById('activityChart')?.getContext('2d');
+        if(ctx){
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'],
+                    datasets: [{
+                        label: 'Réservations',
+                        data: [12, 19, 15, 25, 22, 30, 28],
+                        borderColor: '#667eea',
+                        backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        y: { beginAtZero: true, grid: { color: 'rgba(0,0,0,0.1)' } },
+                        x: { grid: { display: false } }
+                    }
+                }
+            });
+        }
+
+        // Animate stats numbers
+        document.querySelectorAll('.stats-number').forEach(el => {
+            const target = parseInt(el.textContent.replace(/,/g,''));
+            if (!isNaN(target)) {
+                let current = 0;
+                const increment = target / 30;
+                const timer = setInterval(() => {
+                    current += increment;
+                    if (current >= target) {
+                        current = target;
+                        clearInterval(timer);
+                    }
+                    el.textContent = current.toLocaleString();
+                }, 50);
+            }
+        });
+    });
+</script>
+</body>
+</html>

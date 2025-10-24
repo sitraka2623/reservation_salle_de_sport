@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/header :: head}"></head>
+<body>
+    <nav th:replace="~{fragments/header :: navbar}"></nav>
+    
+    <div class="container mt-4">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="card">
+                    <div class="card-header bg-primary text-white">
+                        <h4><i class="bi bi-door-open"></i> Détails de la Salle</h4>
+                    </div>
+                    <div class="card-body">
+                        <div class="row mb-3">
+                            <div class="col-md-4 fw-bold">ID:</div>
+                            <div class="col-md-8" th:text="${salle.id}"></div>
+                        </div>
+                        
+                        <div class="row mb-3">
+                            <div class="col-md-4 fw-bold">Nom:</div>
+                            <div class="col-md-8" th:text="${salle.nom}"></div>
+                        </div>
+                        
+                        <div class="row mb-3">
+                            <div class="col-md-4 fw-bold">Type:</div>
+                            <div class="col-md-8" th:text="${salle.type}"></div>
+                        </div>
+                        
+                        <div class="row mb-3">
+                            <div class="col-md-4 fw-bold">Capacité:</div>
+                            <div class="col-md-8" th:text="${salle.capacite + ' personnes'}"></div>
+                        </div>
+                        
+                        <div class="row mb-3">
+                            <div class="col-md-4 fw-bold">Prix par heure:</div>
+                            <div class="col-md-8" th:text="${#numbers.formatDecimal(salle.prixHeure, 0, 0) + ' Ar'}"></div>
+                        </div>
+                        
+                        <div class="row mb-3">
+                            <div class="col-md-4 fw-bold">Statut:</div>
+                            <div class="col-md-8">
+                                <span th:if="${salle.disponible}" class="badge bg-success">Disponible</span>
+                                <span th:unless="${salle.disponible}" class="badge bg-danger">Indisponible</span>
+                            </div>
+                        </div>
+                        
+                        <div class="row mb-3" th:if="${salle.equipements}">
+                            <div class="col-md-4 fw-bold">Équipements:</div>
+                            <div class="col-md-8" th:text="${salle.equipements}"></div>
+                        </div>
+                        
+                        <div class="row mb-3" th:if="${salle.description}">
+                            <div class="col-md-4 fw-bold">Description:</div>
+                            <div class="col-md-8" th:text="${salle.description}"></div>
+                        </div>
+                        
+                        <hr>
+                        
+                        <div class="d-flex justify-content-between">
+                            <a th:href="@{/salles}" class="btn btn-secondary">
+                                <i class="bi bi-arrow-left"></i> Retour à la liste
+                            </a>
+                            <div>
+                                <a th:href="@{/salles/{id}/edit(id=${salle.id})}" class="btn btn-warning">
+                                    <i class="bi bi-pencil"></i> Modifier
+                                </a>
+                                <a th:href="@{/salles/{id}/delete(id=${salle.id})}" 
+                                   class="btn btn-danger"
+                                   onclick="return confirm('Êtes-vous sûr de vouloir supprimer cette salle?')">
+                                    <i class="bi bi-trash"></i> Supprimer
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <footer th:replace="~{fragments/footer :: footer}"></footer>
+    <div th:replace="~{fragments/footer :: scripts}"></div>
+</body>
+</html>
